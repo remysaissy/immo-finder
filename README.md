@@ -3,15 +3,20 @@
 Un bot Slack extensible pour chercher des appartements en vente sur Paris selon ses propres critères
 
 # Deploiement
-Le bot se deploi sur Heroku avec le Standard Scheduler.
+Le bot se deploit sur Heroku avec le Standard Scheduler.
 clock.py est le point d'entrée à appeler.
 
 Tout est configurable via des variables d'environement, le token Slack comme les paramètres de recherche.
 
+heroku addons:add heroku-postgresql
+heroku addons:create scheduler:standard
+heroku addons:open scheduler
+ --> python clock.py -- hourly run
+ 
+
 # Sources supportées
 
 Actuellement les sources suivantes sont supportées:
-* Agences Saint Ferdinand
 * Bien Ici
 * PAP
 * Se Loger
