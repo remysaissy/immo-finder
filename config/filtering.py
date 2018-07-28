@@ -1,8 +1,12 @@
 import os
 
 # Content filtering
+DISTRICTS = os.getenv('DISTRICTS', [])
+if not isinstance(DISTRICTS, list):
+    DISTRICTS = [e.strip() for e in DISTRICTS.split(',')]
+
 BLACKLISTED_WORDS = os.getenv('BLACKLISTED_WORDS', [])
-if isinstance(BLACKLISTED_WORDS, list) == False:
+if not isinstance(BLACKLISTED_WORDS, list):
     BLACKLISTED_WORDS = [e.strip() for e in BLACKLISTED_WORDS.split(',')]
 
 # Pricing filtering

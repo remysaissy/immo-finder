@@ -1,4 +1,4 @@
 
-from . import slack
+from . import core, slack
 from . import filtering
-from . import pap,seloger
+from . import pap, seloger
