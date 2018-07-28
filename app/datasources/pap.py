@@ -29,7 +29,6 @@ class Pap(BaseDataSource):
         search_type = '-'.join(settings.pap.PAP_SEARCH_TYPE)
         site_base = '/'.join([self._base_site_url, self._base_search_url])
         search_url =  '-'.join([site_base, search_type, settings.pap.PAP_SEARCH_LOCATION, price_range, min_size, str(self._page)])
-        self.logger.info("Search URL is {}".format(search_url))
         return search_url, None
 
     def _has_next_page(self, root):
