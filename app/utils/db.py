@@ -4,13 +4,10 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
 import settings
 
-engine = create_engine(settings.DATABASE_URL)
-
+engine = create_engine(settings.core.DATABASE_URL)
 Base = declarative_base()
-
 
 class Offer(Base):
     """

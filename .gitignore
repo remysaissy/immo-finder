@@ -90,5 +90,5 @@ ENV/
 
 # Project specific
 .idea/
-private.py
+config_private
 offers.db

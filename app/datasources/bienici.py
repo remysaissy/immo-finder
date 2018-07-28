@@ -3,8 +3,8 @@ import json
 import requests
 
 import settings
-from datasources import basedatasource
-from utils import offer
+from app.datasources import basedatasource
+from app.models import offer
 
 
 class BienIci(basedatasource.BaseDataSource):
@@ -37,7 +37,7 @@ class BienIci(basedatasource.BaseDataSource):
         }
         return {'filters': str(filters).replace(' ', '').replace("'false'", "false").replace("'true'", "true").replace("'", '"')}
 
-    def _check_next_page_tag(self, root):
+    def _has_next_page(self, root):
         self._total = int(root['total'])
         self._page += 1
         self._from += int(root['perPage'])
@@ -48,7 +48,7 @@ class BienIci(basedatasource.BaseDataSource):
             params = self._get_search_params()
             return True, url, params
 
-    def _get_page(self, url, params):
+    def _load_web_page(self, url, params):
         r = requests.get(url,
                          params=params,
                          cookies=self._cookies)
@@ -56,7 +56,7 @@ class BienIci(basedatasource.BaseDataSource):
         c = r.content.decode()
         return json.loads(c)
 
-    def _build_offers_list(self, root):
+    def _get_offers(self, root):
         results = []
         r_offers = root['realEstateAds']
         for r_offer in r_offers:

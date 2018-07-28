@@ -1,14 +1,18 @@
 import time
 
-from datasources import pap, seloger, bienici, agencessaintferdinand
+import logging
+from app.utils import logger as log
+from app.datasources import pap, seloger
 
 
 def timed_job():
-    print("{}: Starting scrape cycle".format(time.ctime()))
-    agencessaintferdinand.AgencesSaintFerdinand().run()
+    log.init_logging()
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    logger.info("{}: Starting scrape cycle".format(time.ctime()))
     pap.Pap().run()
-    bienici.BienIci().run()
+    # bienici.BienIci().run()
     seloger.SeLoger().run()
-    print("{}: Successfully finished scraping".format(time.ctime()))
+    logger.info("{}: Successfully finished scraping".format(time.ctime()))
 
 timed_job()
