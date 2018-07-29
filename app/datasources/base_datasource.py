@@ -21,8 +21,8 @@ class BaseDataSource(object):
         self.logger = logging.getLogger()
         # self.__browser = webdriver.PhantomJS()
         chrome_options = Options()
-        # chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", "google-chrome")
-        # chrome_options.binary_location = chrome_exec_shim
+        chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", "google-chrome")
+        chrome_options.binary_location = chrome_exec_shim
         chrome_options.add_argument("--headless")
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--no-sandbox')
