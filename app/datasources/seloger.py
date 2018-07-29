@@ -30,7 +30,6 @@ class SeLoger(BaseDataSource):
             params['surface'] = "{}/NaN".format(settings.filtering.MIN_SIZE)
         params['LISTING-LISTpg'] = self._page
         search_url = '/'.join([self._base_site_url, self._base_search_url])
-        self.logger.info("Search URL is {} with params: {}".format(search_url, params))
         return search_url, params
 
     def _has_next_page(self, root):
@@ -52,7 +51,8 @@ class SeLoger(BaseDataSource):
         if type == 'Local commercial':
             return CommerceOffer()
         else: # Appartement
-            return ApartmentOffer()
+            # return ApartmentOffer()
+            return None
 
     def _is_valid_offer(self, offer, r_offer):
         return True
@@ -60,7 +60,7 @@ class SeLoger(BaseDataSource):
     def _prepare_offer_filling(self, offer, r_offer):
         url = self.get_details_url(offer, r_offer, None)
         offer.details_url = url
-        web_page = self._load_web_page(url, None)
+        web_page = self._load_web_page(url)
         if web_page is not None:
             return web_page.find_all(lambda tag: tag.has_attr('class') and 'p-detail' in tag['class'])[0]
         else:

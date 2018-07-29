@@ -2,10 +2,10 @@ import logging
 import sys
 import time
 import traceback
+from urllib.parse import urlparse, urlencode
 
 import bs4
-from requests import Session, Request
-
+from selenium import webdriver
 
 from app.services import slack
 from app.utils import db
@@ -16,7 +16,8 @@ class BaseDataSource(object):
 
     def __init__(self):
         self.logger = logging.getLogger()
-        self.__session = Session()
+        # self.__browser = webdriver.PhantomJS()
+        self.__browser = webdriver.Chrome()
 
 # region scraping methods
     def _get_search_url(self):
@@ -42,6 +43,8 @@ class BaseDataSource(object):
         r_offers = self._get_offers(root)
         for r_offer in r_offers:
             o = self._get_offer_object(r_offer)
+            if o is None:
+                continue
             if self._is_valid_offer(o, r_offer):
                 payload = self._prepare_offer_filling(o, r_offer)
                 o.fill_object(self, r_offer, payload)
@@ -93,24 +96,17 @@ class BaseDataSource(object):
          Retrieves results and returns a ready to use return object
          :return BeautifulSoup instance.
         """
-        headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.75 Safari/537.36'
-        }
-        p = Request('GET', url, params=params, headers=headers).prepare()
-        self.logger.debug("GET request: {}".format(p.url))
+        if params is None:
+            params = {}
+        url += ('&', '?')[urlparse(url).query == ''] + urlencode(params)
+        self.__browser.get(url)  # This does not throw an exception if it got a 404
+        html = self.__browser.page_source
+        self.logger.info("GET request: {}".format(url))
         result = None
         try:
-            r = self.__session.send(p)
-            c = r.content.decode()
-            result = bs4.BeautifulSoup(c, 'html5lib')
+            result = bs4.BeautifulSoup(html, 'html5lib')
         except Exception as e:
-            self.logger.error("Failed to load webpage {} params: {}: {}".format(url, params, str(e)))
+            self.logger.error("Failed to load webpage {}: {}".format(url, str(e)))
         finally:
             return result
 

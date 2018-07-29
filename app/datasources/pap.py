@@ -50,7 +50,8 @@ class Pap(BaseDataSource):
         if 'local-commercial' in url or 'local-d-activite' in url:
             return CommerceOffer()
         else:
-            return ApartmentOffer()
+            # return ApartmentOffer()
+            return None
 
     def _is_valid_offer(self, offer, r_offer):
         return r_offer.has_attr('name')
