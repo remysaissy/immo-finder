@@ -24,7 +24,7 @@ class BaseDataSource(object):
         chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
         chrome_options.binary_location = chrome_exec_shim
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument('--disable-gpu')
+        # chrome_options.add_argument('--disable-gpu')
         self.__browser = webdriver.Chrome(chrome_options=chrome_options)
 
 # region scraping methods
