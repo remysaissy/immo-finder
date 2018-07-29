@@ -6,6 +6,8 @@ from urllib.parse import urlparse, urlencode
 
 import bs4
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 
 from app.services import slack
 from app.utils import db
@@ -17,7 +19,9 @@ class BaseDataSource(object):
     def __init__(self):
         self.logger = logging.getLogger()
         # self.__browser = webdriver.PhantomJS()
-        self.__browser = webdriver.Chrome()
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        self.__browser = webdriver.Chrome(chrome_options=chrome_options)
 
 # region scraping methods
     def _get_search_url(self):
