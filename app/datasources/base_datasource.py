@@ -1,3 +1,4 @@
+import os
 import logging
 import sys
 import time
@@ -21,9 +22,8 @@ class BaseDataSource(object):
         # self.__browser = webdriver.PhantomJS()
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        self.__browser = webdriver.Chrome(chrome_options=chrome_options)
         chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
-self.selenium = webdriver.Chrome(executable_path=chrome_exec_shim)
+        self.__browser = webdriver.Chrome(executable_path=chrome_exec_shim, chrome_options=chrome_options)
 
 # region scraping methods
     def _get_search_url(self):
