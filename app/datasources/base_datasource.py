@@ -19,14 +19,14 @@ class BaseDataSource(object):
 
     def __init__(self):
         self.logger = logging.getLogger()
-        self.__browser = webdriver.PhantomJS()
-        # chrome_options = Options()
-        # chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
+        # self.__browser = webdriver.PhantomJS()
+        chrome_options = Options()
+        # chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", "google-chrome")
         # chrome_options.binary_location = chrome_exec_shim
-        # chrome_options.add_argument("--headless")
-        # chrome_options.add_argument('--disable-gpu')
-        # chrome_options.add_argument('--no-sandbox')
-        # self.__browser = webdriver.Chrome(chrome_options=chrome_options)
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--no-sandbox')
+        self.__browser = webdriver.Chrome(chrome_options=chrome_options)
 
 # region scraping methods
     def _get_search_url(self):
