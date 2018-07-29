@@ -77,6 +77,7 @@ class SeLoger(BaseDataSource):
         return title
 
     def get_description(self, offer, r_offer, payload):
+        desc = ""
         try:
             desc = payload.find_all(lambda tag: tag.has_attr('id') and tag['id'] == 'js-descriptifBien')[0].text
             desc = desc.strip()
