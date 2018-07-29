@@ -73,7 +73,9 @@ class SeLoger(BaseDataSource):
         return r_offer.find_all(lambda tag: tag.has_attr('class') and 'c-pa-link' in tag['class'])[0]['href']
 
     def get_title(self, offer, r_offer, payload):
-        title = payload.find_all(lambda tag: tag.has_attr('class') and 'detail-title' in tag['class'])[0].text.strip()
+        title = ""
+        if payload is not None:
+            title = payload.find_all(lambda tag: tag.has_attr('class') and 'detail-title' in tag['class'])[0].text.strip()
         return title
 
     def get_description(self, offer, r_offer, payload):
