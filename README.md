@@ -9,8 +9,8 @@ clock.py est le point d'entrée à appeler.
 Tout est configurable via des variables d'environement, le token Slack comme les paramètres de recherche.
 
 heroku stack:set cedar-14
-heroku buildpacks:add https://github.com/stomita/heroku-buildpack-phantomjs
 heroku buildpacks:add https://github.com/heroku/heroku-buildpack-chromedriver.git
+heroku buildpacks:add https://github.com/heroku/heroku-buildpack-xvfb-google-chrome
 heroku addons:add heroku-postgresql
 heroku addons:create scheduler:standard
 heroku addons:open scheduler
