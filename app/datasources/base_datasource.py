@@ -24,9 +24,15 @@ class BaseDataSource(object):
         chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", None)
         chrome_options.binary_location = chrome_exec_shim
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--no-sandbox')
+        # chrome_options.add_argument('--disable-gpu')
+        # chrome_options.add_argument('--no-sandbox')
         self.__browser = webdriver.Chrome(chrome_options=chrome_options)
+        self.__browser.set_window_size(1280, 1024)
+        self.__browser.implicitly_wait(10)
+        self.__browser.set_page_load_timeout(60)
+
+    def __exit__(self, *args):
+        self.__browser.quit()
 
 # region scraping methods
     def _get_search_url(self):
