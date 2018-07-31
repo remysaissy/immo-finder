@@ -1,10 +1,10 @@
 import settings
-from app.datasources.base_datasource import BaseDataSource
+from app.scrapers.base_scraper import BaseScraper
 from app.models.apartment_offer import ApartmentOffer
 from app.models.commerce_offer import CommerceOffer
 
 
-class Pap(BaseDataSource):
+class Pap(BaseScraper):
     """ Pap datasource. """
 
     def __init__(self):
@@ -28,18 +28,18 @@ class Pap(BaseDataSource):
             min_size = ''
         search_type = '-'.join(settings.pap.PAP_SEARCH_TYPE)
         site_base = '/'.join([self._base_site_url, self._base_search_url])
-        search_url =  '-'.join([site_base, search_type, settings.pap.PAP_SEARCH_LOCATION, price_range, min_size, str(self._page)])
-        return search_url, None
+        url =  '-'.join([site_base, search_type, settings.pap.PAP_SEARCH_LOCATION, price_range, min_size, str(self._page)])
+        return url
 
     def _has_next_page(self, root):
         tags = root.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['next'])
         if len(tags) == 0:
-            return False, None, None
+            return False, None
         else:
             self._page += 1
-            url, params = self._get_search_url()
+            url = self._get_search_url()
             self.logger.info("Next page {}".format(self._page))
-            return True, url, params
+            return True, url
 
     def _get_offers(self, root):
         return root.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['item-title'])
@@ -50,20 +50,21 @@ class Pap(BaseDataSource):
         if 'local-commercial' in url or 'local-d-activite' in url:
             return CommerceOffer()
         else:
-            # return ApartmentOffer()
-            return None
+            return ApartmentOffer()
 
     def _is_valid_offer(self, offer, r_offer):
         return r_offer.has_attr('name')
 
     def _prepare_offer_filling(self, offer, r_offer):
+        result = None
         url = '/'.join([self._base_site_url, r_offer['href']])
         offer.details_url = url
-        web_page = self._load_web_page(url, None)
+        web_page = self._load_web_page(url)
         if web_page is not None:
-            return web_page.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['details-item'])[0]
-        else:
-            return None
+            res = web_page.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['details-item'])
+            if res is not None:
+                result = res[0]
+        return result
 
     def _clean_offer_filling(self, offer, r_offer, payload):
         pass
@@ -73,20 +74,30 @@ class Pap(BaseDataSource):
         return url
 
     def get_title(self, offer, r_offer, payload):
-        title = payload.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['h1'])[0].text.strip()
+        title = None
+        res = payload.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['h1'])
+        if res is not None:
+            title = res[0].text.strip()
         return title
 
     def get_description(self, offer, r_offer, payload):
-        desc = payload.find_all(lambda tag: tag.has_attr('class') and 'item-description' in  tag['class'])[0].find_all('p')[0].text
-        desc = desc.strip()
+        desc = None
+        if payload is not None:
+            res = payload.find_all(lambda tag: tag.has_attr('class') and 'item-description' in  tag['class'])[0].find_all('p')
+            if res is not None:
+                desc = res[0].text
+                desc = desc.strip()
         return desc
 
     def get_id(self, offer, r_offer, payload):
         return r_offer['name']
 
     def get_price(self, offer, r_offer, payload):
-        price = ''.join(c for c in r_offer.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['item-price'])[0].text.replace('.','') if c in ['0','1','2','3','4','5','6','7','8','9','0'])
-        price = price.strip()
+        price = None
+        res = r_offer.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['item-price'])
+        if res is not None:
+            price = ''.join(c for c in res[0].text.replace('.','') if c in ['0','1','2','3','4','5','6','7','8','9','0'])
+            price = price.strip()
         return price
 
     def __get_surface_from_field(self, field):

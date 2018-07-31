@@ -1,44 +1,39 @@
-import os
 import logging
 import sys
 import time
 import traceback
-from urllib.parse import urlparse, urlencode
+from weakref import WeakValueDictionary
+
 
 import bs4
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
 
 from app.services import slack
 from app.utils import db
 
 
-class BaseDataSource(object):
+class BaseScraper(object):
     """ Abstract class for implementing a datasource. """
 
-    def __init__(self):
-        self.logger = logging.getLogger()
-        # self.__browser = webdriver.PhantomJS()
-        chrome_options = Options()
-        chrome_exec_shim = os.environ.get("GOOGLE_CHROME_BIN", None)
-        chrome_options.binary_location = chrome_exec_shim
-        chrome_options.add_argument("--headless")
-        # chrome_options.add_argument('--disable-gpu')
-        # chrome_options.add_argument('--no-sandbox')
-        self.__browser = webdriver.Chrome(chrome_options=chrome_options)
-        self.__browser.set_window_size(1280, 1024)
-        self.__browser.implicitly_wait(10)
-        self.__browser.set_page_load_timeout(60)
+    _instances = WeakValueDictionary()
 
-    def __exit__(self, *args):
+    def __init__(self):
+        self._instances[id(self)] = self
+        self.logger = logging.getLogger()
+        self.__browser = webdriver.PhantomJS(service_args=['--load-images=no', '--disk-cache=true'])
+        # self.__browser = webdriver.Chrome()
+        # self.__browser.set_window_size(1280, 1024)
+        # self.__browser.implicitly_wait(10)
+        # self.__browser.set_page_load_timeout(60)
+
+    def __del__(self):
         self.__browser.quit()
 
 # region scraping methods
     def _get_search_url(self):
         """
          The search url of the datasource
-         :return string, params(dict)
+         :return string
         """
         NotImplementedError("Class {} doesn't implement aMethod()".format(self.__class__.__name__))
 
@@ -106,14 +101,11 @@ class BaseDataSource(object):
         """
         NotImplementedError("Class {} doesn't implement aMethod()".format(self.__class__.__name__))
 
-    def _load_web_page(self, url, params=None):
+    def _load_web_page(self, url):
         """
          Retrieves results and returns a ready to use return object
          :return BeautifulSoup instance.
         """
-        if params is None:
-            params = {}
-        url += ('&', '?')[urlparse(url).query == ''] + urlencode(params)
         self.__browser.get(url)  # This does not throw an exception if it got a 404
         html = self.__browser.page_source
         self.logger.info("GET request: {}".format(url))
@@ -130,11 +122,11 @@ class BaseDataSource(object):
           :return list[Offer]: A list of Offer objects.
         """
         has_next = True
-        url, params = self._get_search_url()
+        url = self._get_search_url()
         while has_next:
-            root = self._load_web_page(url, params)
+            root = self._load_web_page(url)
             if root is not None:
-                has_next, url, params = self._has_next_page(root)
+                has_next, url = self._has_next_page(root)
                 yield self.__get_offers(root)
 
     @classmethod
@@ -147,12 +139,12 @@ class BaseDataSource(object):
 # endregion
 
 
-# region datasource identification and run methods
+# region datasource identification and scrape methods
     def get_datasource_name(self):
         """ Returns the datasource's name. """
         return self.__class__.__name__
 
-    def run(self):
+    def scrape(self):
         """ Runs the datasource. """
         self.logger.info("{}: Retrieving offers from {}...".format(time.ctime(), self.get_datasource_name()))
         try:

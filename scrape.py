@@ -1,17 +1,15 @@
 import time
-
 import logging
 from app.utils import logger as log
-from app.datasources import pap, seloger
-
+from app.scrapers import *
 
 def timed_job():
     log.init_logging()
     logger = logging.getLogger()
     logger.info("{}: Starting scrape cycle".format(time.ctime()))
-    pap.Pap().run()
-    # bienici.BienIci().run()
-    seloger.SeLoger().run()
+    # bienici.BienIci().scrape()
+    pap.Pap().scrape()
+    seloger.SeLoger().scrape()
     logger.info("{}: Successfully finished scraping".format(time.ctime()))
 
 timed_job()

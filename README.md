@@ -14,7 +14,7 @@ heroku buildpacks:add https://github.com/heroku/heroku-buildpack-xvfb-google-chr
 heroku addons:add heroku-postgresql
 heroku addons:create scheduler:standard
 heroku addons:open scheduler
- --> python clock.py -- hourly run
+ --> python clock.py -- hourly scrape
  
  
  On your local machine:
@@ -28,7 +28,7 @@ Actuellement les sources suivantes sont supportées:
 * PAP
 * Se Loger
 
-De nouvelles sources peuvent être ajoutées facilement en étandant la classe BaseDataSource puis en ajoutant l'appel à cette dernière dans clock.py
+De nouvelles sources peuvent être ajoutées facilement en étandant la classe BaseScraper puis en ajoutant l'appel à cette dernière dans clock.py
 
 # Paramètres
 

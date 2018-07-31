@@ -21,13 +21,15 @@ class Slack:
                                                                            o.surface, o.price,
                                                                            o.price_per_surface_unit(),
                                                                            o.room_count, o.details_url)
+            channel = settings.slack.SLACK_CHANNEL_APARTMENT
         elif isinstance(o, CommerceOffer):
             desc = "Murs de commerce - {} – {}m2 - {}€ ({}€/m2) - URL: {}".format(o.title,
                                                                                     o.surface, o.price,
                                                                                     o.price_per_surface_unit(),
                                                                                     o.details_url)
+            channel = settings.slack.SLACK_CHANNEL_COMMERCE
         Slack.session.api_call("chat.postMessage",
-                               channel=settings.slack.SLACK_CHANNEL,
+                               channel=channel,
                                text=desc,
                                icon_emoji=settings.slack.SLACK_BOT_ICON,
                                username=settings.slack.SLACK_BOT_NAME)
