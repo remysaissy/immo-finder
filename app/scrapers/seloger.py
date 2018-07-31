@@ -51,7 +51,7 @@ class SeLoger(BaseScraper):
     def _get_offer_object(self, r_offer):
         result = None
         res = r_offer.find_all(lambda tag: tag.has_attr('class') and 'c-pa-link' in tag['class'])
-        if res is not None:
+        if res is not None and len(res) > 0:
             type = res[0].text.strip()
             if type == 'Local commercial':
                 result = CommerceOffer()
@@ -70,7 +70,7 @@ class SeLoger(BaseScraper):
             web_page = self._load_web_page(url)
             if web_page is not None:
                 res = web_page.find_all(lambda tag: tag.has_attr('class') and 'p-detail' in tag['class'])
-                if res is not None:
+                if res is not None and len(res) > 0:
                     result = res[0]
         return result
 
@@ -80,7 +80,7 @@ class SeLoger(BaseScraper):
     def get_details_url(self, offer, r_offer, payload):
         result = None
         res = r_offer.find_all(lambda tag: tag.has_attr('class') and 'c-pa-link' in tag['class'])
-        if res is not None:
+        if res is not None and len(res) > 0:
             result = res[0]['href']
         return result
 
@@ -88,7 +88,7 @@ class SeLoger(BaseScraper):
         title = None
         if payload is not None:
             res = payload.find_all(lambda tag: tag.has_attr('class') and 'detail-title' in tag['class'])
-            if res is not None:
+            if res is not None and len(res) > 0:
                 title = res[0].text.strip()
         return title
 
@@ -107,7 +107,7 @@ class SeLoger(BaseScraper):
     def get_price(self, offer, r_offer, payload):
         price = None
         res = r_offer.find_all(lambda tag: tag.has_attr('class') and 'c-pa-cprice' in tag['class'])
-        if res is not None:
+        if res is not None and len(res) > 0:
             price = res[0].text
             price = unicodedata.normalize("NFKD", price).replace(' ','').replace('€','').strip()
         return price
@@ -115,7 +115,7 @@ class SeLoger(BaseScraper):
     def get_surface(self, offer, r_offer, payload):
         surface = None
         res = r_offer.find_all(lambda tag: tag.has_attr('class') and 'c-pa-criterion' in tag['class'])
-        if res is not None:
+        if res is not None and len(res) > 0:
             criterions = res[0].children
             for criterion in criterions:
                 if hasattr(criterion, 'text'):

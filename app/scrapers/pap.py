@@ -62,7 +62,7 @@ class Pap(BaseScraper):
         web_page = self._load_web_page(url)
         if web_page is not None:
             res = web_page.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['details-item'])
-            if res is not None:
+            if res is not None and len(res) > 0:
                 result = res[0]
         return result
 
@@ -76,7 +76,7 @@ class Pap(BaseScraper):
     def get_title(self, offer, r_offer, payload):
         title = None
         res = payload.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['h1'])
-        if res is not None:
+        if res is not None and len(res) > 0:
             title = res[0].text.strip()
         return title
 
@@ -84,7 +84,7 @@ class Pap(BaseScraper):
         desc = None
         if payload is not None:
             res = payload.find_all(lambda tag: tag.has_attr('class') and 'item-description' in  tag['class'])[0].find_all('p')
-            if res is not None:
+            if res is not None and len(res) > 0:
                 desc = res[0].text
                 desc = desc.strip()
         return desc
@@ -95,7 +95,7 @@ class Pap(BaseScraper):
     def get_price(self, offer, r_offer, payload):
         price = None
         res = r_offer.find_all(lambda tag: tag.has_attr('class') and tag['class'] == ['item-price'])
-        if res is not None:
+        if res is not None and len(res) > 0:
             price = ''.join(c for c in res[0].text.replace('.','') if c in ['0','1','2','3','4','5','6','7','8','9','0'])
             price = price.strip()
         return price
